@@ -1,0 +1,128 @@
+﻿@model MiniStore.WebAPP.Models.SearchResultModel
+
+@inject MiniStore.WebAPP.Services.APIService apiService
+@{
+
+    ViewData["Title"] = "Arama Sonuçları";
+    var categories = apiService.GetCategories(null, null);
+
+}
+
+<div class="row">
+    <div class="list-group col-md-12 col-lg-12">
+        @{
+            if (Model.Categories != null)
+            {
+                for (int i = 0; i < Model.Categories.Count(); i++)
+                {
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12">
+
+                            @if (Model.Categories[i].ParentCategoryId == null)
+                            {
+                                <a href="../Home/Index?categoryId=@categories.Where(x => x.ParentCategoryId == Model.Categories[i].Id).FirstOrDefault().Id" class="list-group-item list-group-item-action">
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class="col-md-2 col-lg-2">
+                                            <b>Kategori Adı :</b>
+                                        </div>
+                                        <div class="col-md-4 col-lg-4">
+                                            @Model.Categories[i].Name
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class="col-md-2 col-lg-2">
+                                            <b>Kategori Tipi :</b>
+                                        </div>
+                                        <div class="col-md-4 col-lg-4">
+                                            Ana Kategori
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="../Home/Index?categoryId=@Model.Categories[i].Id" class="list-group-item list-group-item-action">
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class="col-md-2 col-lg-2">
+                                            <b>Kategori Adı :</b>
+                                        </div>
+                                        <div class="col-md-4 col-lg-4">
+                                            @Model.Categories[i].Name
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-6 mainCategoryOfSubCategory">
+                                        <div class="col-md-2 col-lg-2">
+                                            <b>Ana Kategori Adı :</b>
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 mainCategoryName">
+
+                                        </div>
+                                        <div class="hide col-md-1 col-lg-1">
+                                            <b class="subCategoryId">@Model.Categories[i].Id </b>
+                                            <b class="parentCategoryId">@Model.Categories[i].ParentCategoryId </b>
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                }
+            }
+
+            if (Model.Products != null)
+            {
+                for (int j = 0; j < Model.Products.Count(); j++)
+                {
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12">
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="col-md-3 col-lg-3">
+                                    <img src="~/@Model.Products[j].PhotoUrl" />
+                                </div>
+                                <div class="col-md-3 col-lg-3">
+                                    <b>Ürün Adı</b>  @Model.Products[j].Name
+                                </div>
+                                <div class="col-md-3 col-lg-3">
+                                    <b>Fiyatı</b> @Model.Products[j].Price TL
+                                </div>
+                                <div class="col-md-3 col-lg-3">
+                                    @{
+                                        Model.Categories.Where(c => c.Id == (Model.Products[j].CategoryId)).Select(c => c.Name).ToString();
+                                    }
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $(".hide").hide();
+        var subCategoryId = $("div.mainCategoryOfSubCategory > div.hide > b.subCategoryId").val();
+        var parentCategory = $("div.mainCategoryOfSubCategory > div.hide > b.parentCategoryId").val();
+
+        $(".mainCategoryOfSubCategory").on('load', function () {
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/GetMainCategoryOfSubCategory",
+                contentType: "application/json; charset=utf-8",
+                dataType: "JSON",
+                data: { searchData: subCategoryId, parentCategoryId: parentCategory },
+                success: function (res) {
+                    $(".mainCategoryName").val(res.mainCategoryNameOfSubCategory.Name);
+                }
+            });
+        });
+
+    </script>
+}
+
+
+

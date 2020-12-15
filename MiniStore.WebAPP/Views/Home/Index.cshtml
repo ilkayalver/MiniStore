@@ -1,0 +1,79 @@
+﻿@model MiniStore.WebAPP.Models.MainPageModel
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    var mainCategories = Model.Categories.Where(m => m.ParentCategoryId == null).ToList();
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="container-fluid col-md-12 col-lg-12">
+            <form class="d-flex col-md-12 col-lg-12">
+                <input class="form-control me-2 col-md-9 col-lg-9" type="search" placeholder="Kategori&Ürün Ara" aria-label="Search" id="name_CategoryOrProduct">
+                <a class="btn btn-outline-success col-md-3 col-lg-3" id="btn_search">Arama Yap</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <!-- Navbar content -->
+            <div class="col-md-12 col-lg-12">
+                @{
+                    for (int i = 0; i < mainCategories.Count(); i++)
+                    {
+                        var subtopicId = Model.Categories.Where(c => c.ParentCategoryId == mainCategories[i].Id).FirstOrDefault().Id;
+                        <div class="col-md-2 col-lg-2">
+                            <form class="container-fluid justify-content-start">
+                                <button class="btn btn-outline-success me-2 categoryButton" data-subcategoryid="@subtopicId" type="button">@mainCategories[i].Name</button>
+                            </form>
+                        </div>
+                    }
+                }
+            </div>
+        </nav>
+    </div>
+</div>
+
+@{
+    for (int j = 0; j < Model.Products.Count(); j++)
+    {
+        <div class="row">
+            <div class="card col-md-6 col-lg-6" style="width: 18rem;">
+                <img src="~/@Model.Products[j].PhotoUrl" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Products[j].Name</h5>
+                    <p class="card-text">
+                        <b>Ürün Fiyatı : </b> @Model.Products[j].Price TL
+                        <hr />
+                        <b>Stoktaki Miktar : </b>  @Model.Products[j].Stock tane kaldı...
+                        <hr />
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $(".categoryButton").on('click', function () {
+            if ($(this).data("subcategoryid") != null) {
+                location.href = "/Home/Index?categoryId=" + $(this).data("subcategoryid");
+            }
+            else {
+                alert("Henüz ürün eklenmedi.");
+            }
+        });
+
+        $("#btn_search").on('click', function (e) {
+            e.preventDefault();
+            var queryString = $("#name_CategoryOrProduct").val();
+            location.href = "/Home/SearchProductOrCategory?searchData=" + queryString;
+        });
+
+    </script>
+}

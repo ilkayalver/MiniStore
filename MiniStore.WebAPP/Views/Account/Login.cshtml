@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+
+<div class="row col-lg-10 col-md-10" id="div_FormRegister">
+    <form class="col-lg-10 col-md-10" id="form_Register">
+
+        <div class="row col-lg-10 col-md-10">
+            <div class="form-group col-lg-10 col-md-10">
+                <label class="control-label col-lg-3 col-md-3">Email</label>
+                <input id="email" type="email" class="form-control col-lg-5 col-md-5">
+                <span class="text-danger col-lg-2 col-md-2"></span>
+            </div>
+        </div>
+
+        <div class="row col-lg-10 col-md-10">
+            <div class="form-group col-lg-10 col-md-10">
+                <label class="control-label col-lg-3 col-md-3">Şifreniz</label>
+                <input id="password" type="password" class="form-control col-lg-5 col-md-5">
+                <span class="text-danger col-lg-2 col-md-2"></span>
+            </div>
+        </div>
+
+        <div class="row col-lg-10 col-md-10">
+            <button id="loginButton" type="button" class="btn btn-primary col-lg-3 col-md-3">Giriş Yap</button>
+            <div class="col-lg-3 col-md-3"> </div>
+            <a class="btn btn-primary col-lg-4 col-md-4" href="../../Home/Index">Ana Sayfaya Dön</a>
+        </div>
+
+    </form>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $("#loginButton").on('click', function () {
+            var email = $("#email").val();
+            var password = $("#password").val();
+            $.ajax({
+                type: "POST",
+                url: "https://localhost:44393/User/Login?email=" + email + "&password=" + password,
+                success: function (res) {
+                    if (res == "true") {
+                        location.href = "/Home/Index"
+                    } else {
+                        alert("Giriş yapılamadı.");
+                    }
+                }
+            });
+        });
+    </script>
+}
